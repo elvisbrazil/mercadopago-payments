@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { products } from "@/lib/catalog";
 import { formatBRL } from "@/lib/money";
 
@@ -11,8 +12,14 @@ export default function Home() {
             <div>
               <p className="font-medium">{product.title}</p>
               <p className="text-sm text-zinc-500">{product.description}</p>
+              <p className="mt-1 text-sm font-medium">{formatBRL(product.priceCents)}</p>
             </div>
-            <span className="font-medium whitespace-nowrap">{formatBRL(product.priceCents)}</span>
+            <Link
+              href={`/pix?product=${product.id}`}
+              className="rounded bg-emerald-600 px-3 py-2 text-sm font-medium whitespace-nowrap text-white hover:bg-emerald-700"
+            >
+              Pix
+            </Link>
           </li>
         ))}
       </ul>
