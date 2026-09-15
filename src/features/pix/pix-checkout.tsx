@@ -3,17 +3,7 @@
 import { useState } from "react";
 import type { Product } from "@/lib/catalog";
 import { formatBRL } from "@/lib/money";
-import { Countdown } from "./countdown";
-import { PixQrCode } from "./pix-qr-code";
-
-type Charge = {
-  orderId: string;
-  paymentId: number;
-  amountCents: number;
-  qrCode: string;
-  qrCodeBase64: string;
-  expiresAt: string;
-};
+import { PixCharge, type Charge } from "./pix-charge";
 
 export function PixCheckout({ product }: { product: Product }) {
   const [email, setEmail] = useState("");
@@ -42,15 +32,7 @@ export function PixCheckout({ product }: { product: Product }) {
   }
 
   if (charge) {
-    return (
-      <div className="space-y-4">
-        <p className="text-center text-lg font-medium">{formatBRL(charge.amountCents)}</p>
-        <PixQrCode qrCode={charge.qrCode} qrCodeBase64={charge.qrCodeBase64} />
-        <div className="text-center">
-          <Countdown expiresAt={charge.expiresAt} />
-        </div>
-      </div>
-    );
+    return <PixCharge charge={charge} onRetry={() => setCharge(null)} />;
   }
 
   return (
