@@ -14,12 +14,23 @@ export default function Home() {
               <p className="text-sm text-zinc-500">{product.description}</p>
               <p className="mt-1 text-sm font-medium">{formatBRL(product.priceCents)}</p>
             </div>
-            <Link
-              href={`/pix?product=${product.id}`}
-              className="rounded bg-emerald-600 px-3 py-2 text-sm font-medium whitespace-nowrap text-white hover:bg-emerald-700"
-            >
-              Pix
-            </Link>
+            <div className="flex gap-2">
+              <Link
+                href={`/pix?product=${product.id}`}
+                className="rounded bg-emerald-600 px-3 py-2 text-sm font-medium whitespace-nowrap text-white hover:bg-emerald-700"
+              >
+                Pix
+              </Link>
+              <form action="/api/checkout" method="post">
+                <input type="hidden" name="productId" value={product.id} />
+                <button
+                  type="submit"
+                  className="rounded bg-sky-600 px-3 py-2 text-sm font-medium whitespace-nowrap text-white hover:bg-sky-700"
+                >
+                  Checkout Pro
+                </button>
+              </form>
+            </div>
           </li>
         ))}
       </ul>
