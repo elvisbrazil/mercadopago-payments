@@ -5,6 +5,7 @@ const secret = "webhook-secret";
 const requestId = "bb56a2f1-6aae-46ac-982e-9dcd3581d08e";
 const dataId = "1325012345";
 const ts = "1758400000";
+const now = 1758400000 * 1000 + 30_000;
 
 function header(overrides: { ts?: string; v1?: string } = {}) {
   const timestamp = overrides.ts ?? ts;
@@ -33,22 +34,26 @@ describe("parseSignatureHeader", () => {
 
 describe("verifySignature", () => {
   it("accepts a signature produced with the secret", () => {
-    expect(verifySignature({ signature: header(), requestId, dataId, secret })).toBe(true);
+    expect(verifySignature({ now, signature: header(), requestId, dataId, secret })).toBe(true);
   });
 
   it("rejects a signature made with another secret", () => {
     const v1 = sign(buildManifest(dataId, requestId, ts), "other-secret");
 
-    expect(verifySignature({ signature: header({ v1 }), requestId, dataId, secret })).toBe(false);
+    expect(verifySignature({ now, signature: header({ v1 }), requestId, dataId, secret })).toBe(
+      false,
+    );
   });
 
   it("rejects when the data id was tampered with", () => {
-    expect(verifySignature({ signature: header(), requestId, dataId: "999", secret })).toBe(false);
+    expect(verifySignature({ now, signature: header(), requestId, dataId: "999", secret })).toBe(
+      false,
+    );
   });
 
   it("rejects when the request id does not match", () => {
     expect(
-      verifySignature({ signature: header(), requestId: "another-request", dataId, secret }),
+      verifySignature({ now, signature: header(), requestId: "another-request", dataId, secret }),
     ).toBe(false);
   });
 
@@ -56,26 +61,58 @@ describe("verifySignature", () => {
     const v1 = sign(buildManifest(dataId, requestId, ts), secret);
 
     expect(
-      verifySignature({ signature: `ts=1758400001,v1=${v1}`, requestId, dataId, secret }),
+      verifySignature({ now, signature: `ts=1758400001,v1=${v1}`, requestId, dataId, secret }),
     ).toBe(false);
   });
 
   it("rejects a header without v1 or ts", () => {
-    expect(verifySignature({ signature: `ts=${ts}`, requestId, dataId, secret })).toBe(false);
+    expect(verifySignature({ now, signature: `ts=${ts}`, requestId, dataId, secret })).toBe(false);
     expect(
-      verifySignature({ signature: `v1=${header().split("v1=")[1]}`, requestId, dataId, secret }),
+      verifySignature({
+        now,
+        signature: `v1=${header().split("v1=")[1]}`,
+        requestId,
+        dataId,
+        secret,
+      }),
     ).toBe(false);
   });
 
   it("rejects when the header, request id or data id is missing", () => {
-    expect(verifySignature({ signature: null, requestId, dataId, secret })).toBe(false);
-    expect(verifySignature({ signature: header(), requestId: null, dataId, secret })).toBe(false);
-    expect(verifySignature({ signature: header(), requestId, dataId: null, secret })).toBe(false);
+    expect(verifySignature({ now, signature: null, requestId, dataId, secret })).toBe(false);
+    expect(verifySignature({ now, signature: header(), requestId: null, dataId, secret })).toBe(
+      false,
+    );
+    expect(verifySignature({ now, signature: header(), requestId, dataId: null, secret })).toBe(
+      false,
+    );
+  });
+
+  it("rejects notifications older than the tolerance", () => {
+    expect(
+      verifySignature({ signature: header(), requestId, dataId, secret, now: now + 300_000 }),
+    ).toBe(false);
+  });
+
+  it("rejects timestamps too far in the future", () => {
+    const future = "1758401000";
+
+    expect(
+      verifySignature({ now, signature: header({ ts: future }), requestId, dataId, secret }),
+    ).toBe(false);
+  });
+
+  it("accepts ts sent in milliseconds", () => {
+    const millis = "1758400010000";
+
+    expect(
+      verifySignature({ now, signature: header({ ts: millis }), requestId, dataId, secret }),
+    ).toBe(true);
   });
 
   it("rejects a v1 that is not valid hex", () => {
     expect(
-      verifySignature({ signature: header({ v1: "not-a-hash" }), requestId, dataId, secret }),
+      verifySignature({ now, signature: header({ v1: "not-a-hash" }), requestId, dataId, secret }),
     ).toBe(false);
   });
 });
