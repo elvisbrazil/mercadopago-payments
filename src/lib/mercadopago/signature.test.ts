@@ -16,6 +16,10 @@ describe("buildManifest", () => {
   it("follows the id;request-id;ts template", () => {
     expect(buildManifest("123", "abc", "1700000000")).toBe("id:123;request-id:abc;ts:1700000000;");
   });
+
+  it("lowercases alphanumeric ids", () => {
+    expect(buildManifest("ABC123", "req", "1")).toBe("id:abc123;request-id:req;ts:1;");
+  });
 });
 
 describe("parseSignatureHeader", () => {

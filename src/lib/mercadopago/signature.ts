@@ -19,7 +19,7 @@ export function parseSignatureHeader(header: string): { ts?: string; v1?: string
 }
 
 export function buildManifest(dataId: string, requestId: string, ts: string): string {
-  return `id:${dataId};request-id:${requestId};ts:${ts};`;
+  return `id:${dataId.toLowerCase()};request-id:${requestId};ts:${ts};`;
 }
 
 export function sign(manifest: string, secret: string): string {
