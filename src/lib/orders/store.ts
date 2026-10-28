@@ -1,7 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { Payment } from "@/lib/mercadopago/payments";
-
-export type OrderStatus = "pending" | "paid" | "rejected" | "cancelled" | "expired" | "refunded";
+import { toOrderStatus, type OrderStatus } from "./status";
 
 export type PaymentMethod = "pix" | "checkout_pro";
 
@@ -48,22 +47,6 @@ export function createOrder(input: NewOrder): Order {
 
 export function getOrder(id: string): Order | undefined {
   return orders.get(id);
-}
-
-export function toOrderStatus(payment: Pick<Payment, "status" | "status_detail">): OrderStatus {
-  switch (payment.status) {
-    case "approved":
-      return "paid";
-    case "rejected":
-      return "rejected";
-    case "cancelled":
-      return payment.status_detail === "expired" ? "expired" : "cancelled";
-    case "refunded":
-    case "charged_back":
-      return "refunded";
-    default:
-      return "pending";
-  }
 }
 
 export function applyPayment(

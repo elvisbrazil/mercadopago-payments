@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { OrderStatus } from "@/lib/orders/store";
+import type { OrderStatus } from "@/lib/orders/status";
 
 async function fetchStatus(orderId: string): Promise<OrderStatus | null> {
   const response = await fetch(`/api/orders/${orderId}`, { cache: "no-store" }).catch(() => null);
