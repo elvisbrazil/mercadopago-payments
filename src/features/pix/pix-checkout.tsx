@@ -20,12 +20,12 @@ export function PixCheckout({ product }: { product: Product }) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ productId: product.id, email }),
-    });
-    const data = await response.json();
+    }).catch(() => null);
+    const data = await response?.json().catch(() => null);
     setSubmitting(false);
 
-    if (!response.ok) {
-      setError(data.error ?? "Não foi possível gerar o Pix");
+    if (!response?.ok) {
+      setError(data?.error ?? "Não foi possível gerar o Pix");
       return;
     }
     setCharge(data);

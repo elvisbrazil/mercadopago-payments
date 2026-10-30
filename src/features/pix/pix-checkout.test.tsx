@@ -52,4 +52,16 @@ describe("PixCheckout", () => {
 
     expect(await screen.findByText("Não foi possível gerar o Pix")).toBeInTheDocument();
   });
+
+  it("lets the buyer try again after a network error", async () => {
+    vi.spyOn(globalThis, "fetch").mockRejectedValue(new TypeError("Failed to fetch"));
+    const user = userEvent.setup();
+    render(<PixCheckout product={product} />);
+
+    await user.type(screen.getByLabelText("E-mail"), "comprador@example.com");
+    await user.click(screen.getByRole("button", { name: /gerar pix/i }));
+
+    expect(await screen.findByText("Não foi possível gerar o Pix")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /gerar pix/i })).toBeEnabled();
+  });
 });
