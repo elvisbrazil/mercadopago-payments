@@ -15,6 +15,8 @@ pnpm test
 
 Put a test access token (`TEST-...`) from your Mercado Pago developer panel in `MP_ACCESS_TOKEN` and the webhook secret in `MP_WEBHOOK_SECRET`. Tests mock every call to the API, so they run without credentials.
 
+Mercado Pago only calls back to public HTTPS URLs. To receive webhooks and use the return pages locally, expose the dev server with a tunnel (ngrok, cloudflared) and set `APP_URL` to the tunnel URL. When `APP_URL` is not HTTPS the app leaves `notification_url` out of the requests and relies on polling.
+
 Other scripts: `pnpm lint`, `pnpm format:check`, `pnpm typecheck`, `pnpm build`.
 
 ## How it works
