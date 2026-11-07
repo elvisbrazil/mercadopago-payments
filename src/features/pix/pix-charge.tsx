@@ -50,7 +50,12 @@ export function PixCharge({ charge, onRetry }: Props) {
 
   return (
     <div className="space-y-4">
-      <p className="text-center text-lg font-medium">{formatBRL(charge.amountCents)}</p>
+      <div className="text-center">
+        <p className="text-lg font-medium">{formatBRL(charge.amountCents)}</p>
+        <p className="text-sm text-zinc-500">
+          Escaneie o código no app do seu banco ou use o Pix copia e cola.
+        </p>
+      </div>
       <PixQrCode qrCode={charge.qrCode} qrCodeBase64={charge.qrCodeBase64} />
       <div className="text-center">
         <Countdown expiresAt={charge.expiresAt} />
